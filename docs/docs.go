@@ -14,7 +14,78 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {},
+    "paths": {
+        "/users": {
+            "post": {
+                "description": "관리자, 학생의 역할로 회원가입",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "회원가입",
+                "parameters": [
+                    {
+                        "description": "회원가입 요청",
+                        "name": "CreateUserRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "domain.CreateUserRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "userName",
+                "userType"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "1234"
+                },
+                "userName": {
+                    "type": "string",
+                    "example": "classting_admin"
+                },
+                "userType": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.UserType"
+                        }
+                    ],
+                    "example": "ADMIN"
+                }
+            }
+        },
+        "domain.UserType": {
+            "type": "string",
+            "enum": [
+                "ADMIN",
+                "STUDENT"
+            ],
+            "x-enum-varnames": [
+                "UserUseTypeAdmin",
+                "UserUseTypeStudent"
+            ]
+        }
+    },
     "securityDefinitions": {
         "BearerAuth": {
             "type": "apiKey",
