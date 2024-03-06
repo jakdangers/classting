@@ -12,10 +12,12 @@ type UserRepository interface {
 
 type UserService interface {
 	CreateUser(ctx context.Context, req CreateUserRequest) error
+	LoginUser(ctx context.Context, req LoginUserRequest) (LoginUserResponse, error)
 }
 
 type UserController interface {
 	CreateUser(c *gin.Context)
+	LoginUser(c *gin.Context)
 }
 
 // UserType 고랭에는 별도의 enum 타입이 없어서 string으로 정의

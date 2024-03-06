@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/users": {
             "post": {
-                "description": "관리자, 학생의 역할로 회원가입",
+                "description": "관리자, 학생의 역할로 회원가입 요청 (관리자의 경우 UserType = ADMIN, 학생의 경우 UserType = STUDENT)",
                 "consumes": [
                     "application/json"
                 ],
@@ -42,6 +42,40 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "description": "예시 유저네임: classting_admin, 비밀번호: classting, UserType = ADMIN / classting_student, 비밀번호: classting, UserType = STUDENT",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "로그인",
+                "parameters": [
+                    {
+                        "description": "로그인 요청",
+                        "name": "LoginUserRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.LoginUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.LoginUserResponse"
+                        }
                     }
                 }
             }
@@ -71,6 +105,40 @@ const docTemplate = `{
                         }
                     ],
                     "example": "ADMIN"
+                }
+            }
+        },
+        "domain.LoginUserRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "userName"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "1234"
+                },
+                "userName": {
+                    "type": "string",
+                    "example": "classting_admin"
+                }
+            }
+        },
+        "domain.LoginUserResponse": {
+            "type": "object",
+            "required": [
+                "accessToken",
+                "expiresIn"
+            ],
+            "properties": {
+                "accessToken": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDg4ODgxOTIsInVzZXJJRCI6MX0.WVQGpeNbCpWSKuvYO7rFv6HoXaEA4_VQZSl7oMhmROk"
+                },
+                "expiresIn": {
+                    "type": "integer",
+                    "example": 1708888192
                 }
             }
         },

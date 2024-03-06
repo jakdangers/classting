@@ -34,7 +34,7 @@ func main() {
 	userRepsitory := user.NewUserRepository(db)
 
 	// service
-	userService := user.NewUserService(userRepsitory)
+	userService := user.NewUserService(userRepsitory, cfg)
 
 	// controller
 	userController := user.NewUserController(userService)
