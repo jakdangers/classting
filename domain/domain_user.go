@@ -2,11 +2,20 @@ package domain
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 )
 
 type UserRepository interface {
 	CreateUser(ctx context.Context, user User) (int, error)
 	FindUserByUserName(ctx context.Context, userName string) (*User, error)
+}
+
+type UserService interface {
+	CreateUser(ctx context.Context, req CreateUserRequest) error
+}
+
+type UserController interface {
+	CreateUser(c *gin.Context)
 }
 
 // UserType 고랭에는 별도의 enum 타입이 없어서 string으로 정의

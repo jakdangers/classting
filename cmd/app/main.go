@@ -2,6 +2,7 @@ package main
 
 import (
 	"classting/config"
+	"classting/internal/user"
 	"classting/pkg/db"
 	"classting/pkg/router"
 	"context"
@@ -23,11 +24,23 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = db.NewSql(cfg)
+	db, err := db.NewSql(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 	router := router.NewServeRouter(cfg)
+
+	// domain
+	userRepsitory := user.NewUserRepository(db)
+
+	// service
+	userService := user.NewUserService(userRepsitory)
+
+	// controller
+	userController := user.NewUserController(userService)
+
+	// routes
+	user.RegisterRoutes(router, userController)
 
 	// http server
 	srv := &http.Server{Addr: cfg.HTTP.Port, Handler: router}
@@ -43,7 +56,7 @@ func main() {
 	<-quit
 	log.Println("Shutdown Server ...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal("Server Shutdown:", err)
@@ -51,7 +64,7 @@ func main() {
 
 	select {
 	case <-ctx.Done():
-		log.Println("timeout of 5 seconds.")
+		log.Println("timeout of 1 seconds.")
 	}
 	log.Println("Server exiting")
 }

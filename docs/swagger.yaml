@@ -1,6 +1,52 @@
+definitions:
+  domain.CreateUserRequest:
+    properties:
+      password:
+        example: "1234"
+        type: string
+      userName:
+        example: classting_admin
+        type: string
+      userType:
+        allOf:
+        - $ref: '#/definitions/domain.UserType'
+        example: ADMIN
+    required:
+    - password
+    - userName
+    - userType
+    type: object
+  domain.UserType:
+    enum:
+    - ADMIN
+    - STUDENT
+    type: string
+    x-enum-varnames:
+    - UserUseTypeAdmin
+    - UserUseTypeStudent
 info:
   contact: {}
-paths: {}
+paths:
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: 관리자, 학생의 역할로 회원가입
+      parameters:
+      - description: 회원가입 요청
+        in: body
+        name: CreateUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: 회원가입
+      tags:
+      - User
 securityDefinitions:
   BearerAuth:
     in: header
