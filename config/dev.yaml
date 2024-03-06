@@ -1,0 +1,16 @@
+app:
+  name: classting
+
+http:
+  port: ':3000'
+
+mysql:
+  host: classting-db
+  port: 3306
+  user: classting
+  dbName: classting
+  password: classting
+
+auth:
+  secret: classting
+  expiryHours: 24

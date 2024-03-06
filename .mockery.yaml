@@ -1,0 +1,10 @@
+all: True
+quiet: False
+disable-version-string: False
+with-expecter: True
+mockname: "{{.InterfaceName}}"
+filename: "{{.MockName}}.go"
+dir: mocks/.
+outpkg: mocks
+packages:
+  classting/domain:
