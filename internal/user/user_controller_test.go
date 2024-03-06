@@ -109,3 +109,79 @@ func Test_userController_CreateUser(t *testing.T) {
 		})
 	}
 }
+
+func Test_userController_LoginUser(t *testing.T) {
+	tests := []struct {
+		name  string
+		input func() *bytes.Reader
+		mock  func(ts userControllerTestSuite)
+		code  int
+	}{
+		{
+			name: "PASS - 올바른 유저네임, 비밀번호",
+			input: func() *bytes.Reader {
+				req := domain.CreateUserRequest{
+					UserName: "classting_admin",
+					Password: "classting",
+				}
+				jsonData, _ := json.Marshal(req)
+
+				return bytes.NewReader(jsonData)
+			},
+			mock: func(ts userControllerTestSuite) {
+				ts.userService.EXPECT().LoginUser(mock.Anything, domain.LoginUserRequest{
+					UserName: "classting_admin",
+					Password: "classting",
+				}).
+					Return(domain.LoginUserResponse{}, nil).Once()
+			},
+			code: http.StatusOK,
+		},
+		{
+			name: "FAIL - 유저네임 빈 문자열",
+			input: func() *bytes.Reader {
+				req := domain.CreateUserRequest{
+					UserName: "",
+					Password: "classting",
+				}
+				jsonData, _ := json.Marshal(req)
+
+				return bytes.NewReader(jsonData)
+			},
+			mock: func(ts userControllerTestSuite) {},
+			code: http.StatusBadRequest,
+		},
+		{
+			name: "FAIL - 비밀번호 빈 문자열",
+			input: func() *bytes.Reader {
+				req := domain.CreateUserRequest{
+					UserName: "classting_admin",
+					Password: "",
+				}
+				jsonData, _ := json.Marshal(req)
+
+				return bytes.NewReader(jsonData)
+			},
+			mock: func(ts userControllerTestSuite) {},
+			code: http.StatusBadRequest,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// given
+			ts := setupUserControllerTestSuite(t)
+			tt.mock(ts)
+			req, _ := http.NewRequest(http.MethodPost, "/users/login", tt.input())
+			req.Header.Set("Content-Type", "application/json")
+
+			// when
+			rec := httptest.NewRecorder()
+			ts.router.ServeHTTP(rec, req)
+
+			// then
+			assert.Equal(t, tt.code, rec.Code)
+			ts.userService.AssertExpectations(t)
+		})
+	}
+}

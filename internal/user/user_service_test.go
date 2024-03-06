@@ -1,6 +1,7 @@
 package user
 
 import (
+	"classting/config"
 	"classting/domain"
 	"classting/mocks"
 	"context"
@@ -18,7 +19,12 @@ func setupUserServiceTestSuite(t *testing.T) userServiceTestSuite {
 	var us userServiceTestSuite
 
 	us.userRepository = mocks.NewUserRepository(t)
-	us.service = NewUserService(us.userRepository)
+	us.service = NewUserService(us.userRepository, &config.Config{
+		Auth: config.Auth{
+			Secret:      "test_secret",
+			ExpiryHours: 24,
+		},
+	})
 
 	return us
 }
@@ -80,6 +86,84 @@ func Test_userService_CreateUser(t *testing.T) {
 			err := ts.service.CreateUser(tt.args.ctx, tt.args.req)
 
 			// then
+			if err != nil {
+				assert.Equalf(t, tt.wantErr, err != nil, err.Error())
+			}
+		})
+	}
+}
+
+func Test_userService_LoginUser(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		req domain.LoginUserRequest
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		mock    func(ts userServiceTestSuite)
+		wantErr bool
+	}{
+		{
+			name: "PASS - 유효한 유저네임, 패스워드",
+			args: args{
+				ctx: context.Background(),
+				req: domain.LoginUserRequest{
+					UserName: "classting_admin",
+					Password: "classting",
+				},
+			},
+			mock: func(ts userServiceTestSuite) {
+				hashPassword, _ := hashPasswordWithSalt("classting")
+				ts.userRepository.EXPECT().FindUserByUserName(mock.Anything, "classting_admin").
+					Return(&domain.User{
+						Base: domain.Base{
+							ID: 1,
+						},
+						UserName: "classting_admin",
+						Password: hashPassword,
+						UseType:  domain.UserUseTypeAdmin,
+					}, nil).Once()
+			},
+			wantErr: false,
+		},
+		{
+			name: "FAIL - 유효한 유저네임 잘못된 패스워드",
+			args: args{
+				ctx: context.Background(),
+				req: domain.LoginUserRequest{
+					UserName: "classting_admin",
+					Password: "wrong_classting",
+				},
+			},
+			mock: func(ts userServiceTestSuite) {
+				hashPassword, _ := hashPasswordWithSalt("classting")
+				ts.userRepository.EXPECT().FindUserByUserName(mock.Anything, "classting_admin").
+					Return(&domain.User{
+						Base: domain.Base{
+							ID: 1,
+						},
+						UserName: "classting_admin",
+						Password: hashPassword,
+						UseType:  domain.UserUseTypeAdmin,
+					}, nil).Once()
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// given
+			ts := setupUserServiceTestSuite(t)
+			tt.mock(ts)
+
+			// when
+			_, err := ts.service.LoginUser(tt.args.ctx, tt.args.req)
+
+			// then
+			ts.userRepository.AssertExpectations(t)
 			if err != nil {
 				assert.Equalf(t, tt.wantErr, err != nil, err.Error())
 			}

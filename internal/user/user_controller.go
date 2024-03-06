@@ -13,6 +13,7 @@ func RegisterRoutes(e *gin.Engine, controller domain.UserController) {
 	api := e.Group("/users")
 	{
 		api.POST("", controller.CreateUser)
+		api.POST("/login", controller.LoginUser)
 	}
 }
 
@@ -59,4 +60,38 @@ func (u userController) CreateUser(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+// LoginUser
+// @Tags User
+// @Summary 로그인
+// @Description 예시 유저네임: classting_admin, 비밀번호: classting, UserType = ADMIN / classting_student, 비밀번호: classting, UserType = STUDENT
+// @Accept json
+// @Produce json
+// @Param LoginUserRequest body domain.LoginUserRequest true "로그인 요청"
+// @Success 200 {object} domain.LoginUserResponse
+// @Router /users/login [post]
+func (u userController) LoginUser(c *gin.Context) {
+	var req domain.LoginUserRequest
+
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(cerrors.ToSentinelAPIError(err))
+		return
+	}
+
+	if err := req.Validate(); err != nil {
+		c.JSON(cerrors.ToSentinelAPIError(err))
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 30*time.Second)
+	defer cancel()
+
+	res, err := u.service.LoginUser(ctx, req)
+	if err != nil {
+		c.JSON(cerrors.ToSentinelAPIError(err))
+		return
+	}
+
+	c.JSON(domain.ClasstingResponseFrom(http.StatusOK, res))
 }
