@@ -52,3 +52,30 @@ func (s schoolService) CreateSchool(ctx context.Context, req domain.CreateSchool
 
 	return nil
 }
+
+func (s schoolService) ListSchools(ctx context.Context, req domain.ListSchoolsRequest) (domain.ListSchoolsResponse, error) {
+	const op cerrors.Op = "school/service/ListSchools"
+
+	schools, err := s.schoolRepository.ListSchools(ctx, domain.ListSchoolsParams{
+		UserID: req.UserID,
+		Cursor: req.Cursor,
+	})
+	if err != nil {
+		return domain.ListSchoolsResponse{}, cerrors.E(op, cerrors.Internal, err, "학교를 조회하는 중에 에러가 발생했습니다.")
+	}
+
+	var schoolDTOs []domain.SchoolDTO
+	for _, school := range schools {
+		schoolDTOs = append(schoolDTOs, domain.SchoolDTOFrom(school))
+	}
+
+	var cursor *int
+	if len(schoolDTOs) > 0 {
+		cursor = &schoolDTOs[len(schoolDTOs)-1].ID
+	}
+
+	return domain.ListSchoolsResponse{
+		Schools: schoolDTOs,
+		Cursor:  cursor,
+	}, nil
+}

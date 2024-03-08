@@ -6,6 +6,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 )
 
 type schoolRepository struct {
@@ -34,6 +35,39 @@ func (s schoolRepository) CreateSchool(ctx context.Context, school domain.School
 	}
 
 	return int(userID), nil
+}
+
+func (s schoolRepository) ListSchools(ctx context.Context, params domain.ListSchoolsParams) ([]domain.School, error) {
+	const op cerrors.Op = "school/schoolRepository/ListSchools"
+
+	var schools []domain.School
+
+	query := fmt.Sprintf(listSchoolQuery,
+		params.AndUserID(),
+		params.AfterCursor(),
+	)
+
+	rows, err := s.sqlDB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, cerrors.E(op, cerrors.Internal, err, "서버 에러가 발생했습니다.")
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var school domain.School
+		err := rows.Scan(
+			&school.ID,
+			&school.UserID,
+			&school.Name,
+			&school.Region,
+		)
+		if err != nil {
+			return nil, cerrors.E(op, cerrors.Internal, err, "서버 에러가 발생했습니다.")
+		}
+		schools = append(schools, school)
+	}
+
+	return schools, nil
 }
 
 func (s schoolRepository) FindSchoolByNameAndRegion(ctx context.Context, params domain.FindSchoolByNameAndRegionParams) (*domain.School, error) {

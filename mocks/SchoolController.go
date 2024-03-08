@@ -53,6 +53,39 @@ func (_c *SchoolController_CreateSchool_Call) RunAndReturn(run func(*gin.Context
 	return _c
 }
 
+// ListSchools provides a mock function with given fields: c
+func (_m *SchoolController) ListSchools(c *gin.Context) {
+	_m.Called(c)
+}
+
+// SchoolController_ListSchools_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListSchools'
+type SchoolController_ListSchools_Call struct {
+	*mock.Call
+}
+
+// ListSchools is a helper method to define mock.On call
+//   - c *gin.Context
+func (_e *SchoolController_Expecter) ListSchools(c interface{}) *SchoolController_ListSchools_Call {
+	return &SchoolController_ListSchools_Call{Call: _e.mock.On("ListSchools", c)}
+}
+
+func (_c *SchoolController_ListSchools_Call) Run(run func(c *gin.Context)) *SchoolController_ListSchools_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context))
+	})
+	return _c
+}
+
+func (_c *SchoolController_ListSchools_Call) Return() *SchoolController_ListSchools_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *SchoolController_ListSchools_Call) RunAndReturn(run func(*gin.Context)) *SchoolController_ListSchools_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewSchoolController creates a new instance of SchoolController. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewSchoolController(t interface {
