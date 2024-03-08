@@ -35,3 +35,14 @@ CREATE TABLE news
     FOREIGN KEY (school_id) REFERENCES schools (id)
 );
 
+CREATE TABLE subscriptions
+(
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    user_id     INT          NOT NULL,
+    school_id   INT          NOT NULL,
+    create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    delete_date TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (school_id) REFERENCES schools (id)
+);
