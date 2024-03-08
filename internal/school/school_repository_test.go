@@ -291,3 +291,71 @@ func Test_schoolRepository_ListSchools(t *testing.T) {
 		})
 	}
 }
+
+func Test_schoolRepository_FindSchoolByID(t *testing.T) {
+	type args struct {
+		ctx      context.Context
+		schoolID int
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		mock    func(ts schoolRepositoryTestSuite)
+		want    *domain.School
+		wantErr bool
+	}{
+		{
+			name: "PASS - 존재하는 학교 조회",
+			args: args{
+				ctx:      context.Background(),
+				schoolID: 1,
+			},
+			mock: func(ts schoolRepositoryTestSuite) {
+				query := "SELECT id, user_id, name, region FROM schools"
+				columns := []string{"id", "user_id", "name", "region"}
+				rows := sqlmock.NewRows(columns).AddRow(1, 1, "클래스팅", "서울")
+				ts.sqlMock.ExpectQuery(query).WithArgs(1).WillReturnRows(rows)
+			},
+			want: &domain.School{
+				Base: domain.Base{
+					ID: 1,
+				},
+				UserID: 1,
+				Name:   "클래스팅",
+				Region: "서울",
+			},
+			wantErr: false,
+		},
+		{
+			name: "PASS - 존재하지 않는 학교 조회",
+			args: args{
+				ctx:      context.Background(),
+				schoolID: 1,
+			},
+			mock: func(ts schoolRepositoryTestSuite) {
+				query := "SELECT id, user_id, name, region FROM schools"
+				ts.sqlMock.ExpectQuery(query).WithArgs(1).WillReturnError(sql.ErrNoRows)
+			},
+			want:    nil,
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// given
+			ts := setupSchoolRepositoryTestSuite()
+			tt.mock(ts)
+
+			// when
+			got, err := ts.schoolRepository.FindSchoolByID(tt.args.ctx, tt.args.schoolID)
+
+			// then
+			assert.Equal(t, tt.want, got)
+			if err != nil {
+				assert.Equalf(t, tt.wantErr, err != nil, err.Error())
+			}
+		})
+	}
+}

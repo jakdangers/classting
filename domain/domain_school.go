@@ -8,8 +8,9 @@ import (
 
 type SchoolRepository interface {
 	CreateSchool(ctx context.Context, school School) (int, error)
-	FindSchoolByNameAndRegion(ctx context.Context, params FindSchoolByNameAndRegionParams) (*School, error)
 	ListSchools(ctx context.Context, params ListSchoolsParams) ([]School, error)
+	FindSchoolByNameAndRegion(ctx context.Context, params FindSchoolByNameAndRegionParams) (*School, error)
+	FindSchoolByID(ctx context.Context, schoolID int) (*School, error)
 }
 
 type SchoolService interface {

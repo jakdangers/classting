@@ -22,3 +22,16 @@ CREATE TABLE schools
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+CREATE TABLE news
+(
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    title       VARCHAR(255) NOT NULL,
+    user_id     INT          NOT NULL,
+    school_id   INT          NOT NULL,
+    create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    delete_date TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (school_id) REFERENCES schools (id)
+);
+
