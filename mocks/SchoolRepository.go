@@ -130,6 +130,61 @@ func (_c *SchoolRepository_FindSchoolByNameAndRegion_Call) RunAndReturn(run func
 	return _c
 }
 
+// ListSchools provides a mock function with given fields: ctx, params
+func (_m *SchoolRepository) ListSchools(ctx context.Context, params domain.ListSchoolsParams) ([]domain.School, error) {
+	ret := _m.Called(ctx, params)
+
+	var r0 []domain.School
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, domain.ListSchoolsParams) ([]domain.School, error)); ok {
+		return rf(ctx, params)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, domain.ListSchoolsParams) []domain.School); ok {
+		r0 = rf(ctx, params)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.School)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, domain.ListSchoolsParams) error); ok {
+		r1 = rf(ctx, params)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SchoolRepository_ListSchools_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListSchools'
+type SchoolRepository_ListSchools_Call struct {
+	*mock.Call
+}
+
+// ListSchools is a helper method to define mock.On call
+//   - ctx context.Context
+//   - params domain.ListSchoolsParams
+func (_e *SchoolRepository_Expecter) ListSchools(ctx interface{}, params interface{}) *SchoolRepository_ListSchools_Call {
+	return &SchoolRepository_ListSchools_Call{Call: _e.mock.On("ListSchools", ctx, params)}
+}
+
+func (_c *SchoolRepository_ListSchools_Call) Run(run func(ctx context.Context, params domain.ListSchoolsParams)) *SchoolRepository_ListSchools_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(domain.ListSchoolsParams))
+	})
+	return _c
+}
+
+func (_c *SchoolRepository_ListSchools_Call) Return(_a0 []domain.School, _a1 error) *SchoolRepository_ListSchools_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *SchoolRepository_ListSchools_Call) RunAndReturn(run func(context.Context, domain.ListSchoolsParams) ([]domain.School, error)) *SchoolRepository_ListSchools_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewSchoolRepository creates a new instance of SchoolRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewSchoolRepository(t interface {

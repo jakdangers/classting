@@ -15,6 +15,7 @@ func RegisterRoutes(e *gin.Engine, controller domain.SchoolController, cfg *conf
 	api := e.Group("/schools")
 	{
 		api.POST("", router.JWTMiddleware(cfg.Auth.Secret, []domain.UserType{domain.UserUseTypeAdmin}), controller.CreateSchool)
+		api.GET("", router.JWTMiddleware(cfg.Auth.Secret, []domain.UserType{domain.UserUseTypeAdmin, domain.UserUseTypeStudent}), controller.ListSchools)
 	}
 }
 
@@ -31,13 +32,13 @@ func NewSchoolController(service domain.SchoolService, cfg *config.Config) *scho
 var _ domain.SchoolController = (*schoolController)(nil)
 
 // CreateSchool
-// @Tags School
-// @Summary 학교 생성
+// @Tags Schools
+// @Summary 학교 생성 [필수 구현]
 // @Description 지역, 학교명으로 학교를 생성합니다. (지역, 학교명이 중복되지 않아야 합니다.)
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param CreateSchoolRequest body domain.CreateSchoolRequest true "회원가입 요청"
+// @Param CreateSchoolRequest body domain.CreateSchoolRequest true "학교 생성 요청"
 // @Success 204
 // @Router /schools [post]
 func (u schoolController) CreateSchool(c *gin.Context) {
@@ -69,4 +70,39 @@ func (u schoolController) CreateSchool(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+// ListSchools
+// @Summary 학교 목록 조회 [테스트 추가 API]
+// @Description 학교 목록을 조회합니다 (권한: 관리자, 학생) userID를 쿼리스트링에 입력시 해당 유저의 학교 목록을 조회합니다. 디폴트 20개씩 조회
+// @Tags Schools
+// @Produce json
+// @Security BearerAuth
+// @Param cursor query int false "커서"
+// @Param userID query int false "유저 아이디"
+// @Success 200 {object} domain.ListSchoolsResponse "학교 목록"
+// @Router /schools [get]
+func (u schoolController) ListSchools(c *gin.Context) {
+	var req domain.ListSchoolsRequest
+
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(cerrors.ToSentinelAPIError(err))
+		return
+	}
+
+	if err := req.Validate(); err != nil {
+		c.JSON(cerrors.ToSentinelAPIError(err))
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 30*time.Second)
+	defer cancel()
+
+	res, err := u.service.ListSchools(ctx, req)
+	if err != nil {
+		c.JSON(cerrors.ToSentinelAPIError(err))
+		return
+	}
+
+	c.JSON(domain.ClasstingResponseFrom(http.StatusOK, res))
 }

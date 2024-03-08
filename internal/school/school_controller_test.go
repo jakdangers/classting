@@ -10,8 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"k8s.io/utils/pointer"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 	"time"
 )
@@ -118,6 +120,118 @@ func Test_schoolController_CreateSchool(t *testing.T) {
 
 			// when
 			rec := httptest.NewRecorder()
+			ts.router.ServeHTTP(rec, req)
+
+			// then
+			assert.Equal(t, tt.code, rec.Code)
+			ts.schoolService.AssertExpectations(t)
+		})
+	}
+}
+
+func Test_schoolController_ListSchools(t *testing.T) {
+	tests := []struct {
+		name  string
+		query func() string
+		mock  func(ts schoolControllerTestSuite)
+		code  int
+	}{
+		{
+			name: "PASS - 전체 조회 (특정 유저 아이디 입력 X)",
+			query: func() string {
+				params := url.Values{}
+				return params.Encode()
+			},
+			mock: func(ts schoolControllerTestSuite) {
+				ts.schoolService.EXPECT().ListSchools(mock.Anything, domain.ListSchoolsRequest{
+					UserID: nil,
+				}).Return(domain.ListSchoolsResponse{}, nil).Once()
+			},
+			code: http.StatusOK,
+		},
+		{
+			name: "PASS - 전체 조회 (특정 유저 아이디 입력)",
+			query: func() string {
+				params := url.Values{}
+				params.Add("userID", "1")
+				return params.Encode()
+			},
+			mock: func(ts schoolControllerTestSuite) {
+				ts.schoolService.EXPECT().ListSchools(mock.Anything, domain.ListSchoolsRequest{
+					UserID: pointer.Int(1),
+				}).Return(domain.ListSchoolsResponse{}, nil).Once()
+			},
+			code: http.StatusOK,
+		},
+		{
+			name: "PASS - 일부 조회 (커서 입력)",
+			query: func() string {
+				params := url.Values{}
+				params.Add("cursor", "1")
+				return params.Encode()
+			},
+			mock: func(ts schoolControllerTestSuite) {
+				ts.schoolService.EXPECT().ListSchools(mock.Anything, domain.ListSchoolsRequest{
+					UserID: nil,
+					Cursor: pointer.Int(1),
+				}).Return(domain.ListSchoolsResponse{}, nil).Once()
+			},
+			code: http.StatusOK,
+		},
+		{
+			name: "PASS - 전체 조회 (커서 미 입력)",
+			query: func() string {
+				params := url.Values{}
+				return params.Encode()
+			},
+			mock: func(ts schoolControllerTestSuite) {
+				ts.schoolService.EXPECT().ListSchools(mock.Anything, domain.ListSchoolsRequest{
+					UserID: nil,
+					Cursor: nil,
+				}).Return(domain.ListSchoolsResponse{}, nil).Once()
+			},
+			code: http.StatusOK,
+		},
+		{
+			name: "FAIL - 전체 조회 (커서 제로 값 입력)",
+			query: func() string {
+				params := url.Values{}
+				params.Add("cursor", "0")
+				return params.Encode()
+			},
+			mock: func(ts schoolControllerTestSuite) {},
+			code: http.StatusBadRequest,
+		},
+		{
+			name: "FAIL - 전체 조회 (유저 아이디 제로값)",
+			query: func() string {
+				params := url.Values{}
+				params.Add("userID", "0")
+				return params.Encode()
+			},
+			mock: func(ts schoolControllerTestSuite) {},
+			code: http.StatusBadRequest,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// given
+			ts := setupSchoolControllerTestSuite(t)
+			tt.mock(ts)
+			req, _ := http.NewRequest(http.MethodGet, "/schools", nil)
+			req.URL.RawQuery = tt.query()
+			token, _ := user.CreateAccessToken(domain.User{
+				Base: domain.Base{
+					ID: 1,
+				},
+				Type: domain.UserUseTypeStudent,
+			}, ts.cfg.Auth.Secret, time.Now().UTC().Add(time.Hour*time.Duration(24)))
+			req.Header.Set("Authorization", "Bearer "+token)
+
+			// when
+			rec := httptest.NewRecorder()
+			t.Logf("Request URL: %s", req.URL.String())
 			ts.router.ServeHTTP(rec, req)
 
 			// then

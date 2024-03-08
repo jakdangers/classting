@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/samber/lo"
 	"net/http"
 	"strings"
 )
@@ -79,13 +80,10 @@ func JWTMiddleware(secret string, userTypes []domain.UserType) gin.HandlerFunc {
 			return
 		}
 
-		for _, userType := range userTypes {
-			if userType != usertype {
-				fmt.Println("")
-				c.JSON(cerrors.NewSentinelAPIError(http.StatusUnauthorized, "권한이 없습니다."))
-				c.Abort()
-				return
-			}
+		if !lo.Contains([]domain.UserType{domain.UserUseTypeAdmin, domain.UserUseTypeStudent}, usertype) {
+			c.JSON(cerrors.NewSentinelAPIError(http.StatusUnauthorized, "권한이 없습니다."))
+			c.Abort()
+			return
 		}
 
 		c.Set("userID", userID)

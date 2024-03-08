@@ -65,6 +65,59 @@ func (_c *SchoolService_CreateSchool_Call) RunAndReturn(run func(context.Context
 	return _c
 }
 
+// ListSchools provides a mock function with given fields: ctx, req
+func (_m *SchoolService) ListSchools(ctx context.Context, req domain.ListSchoolsRequest) (domain.ListSchoolsResponse, error) {
+	ret := _m.Called(ctx, req)
+
+	var r0 domain.ListSchoolsResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, domain.ListSchoolsRequest) (domain.ListSchoolsResponse, error)); ok {
+		return rf(ctx, req)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, domain.ListSchoolsRequest) domain.ListSchoolsResponse); ok {
+		r0 = rf(ctx, req)
+	} else {
+		r0 = ret.Get(0).(domain.ListSchoolsResponse)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, domain.ListSchoolsRequest) error); ok {
+		r1 = rf(ctx, req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SchoolService_ListSchools_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListSchools'
+type SchoolService_ListSchools_Call struct {
+	*mock.Call
+}
+
+// ListSchools is a helper method to define mock.On call
+//   - ctx context.Context
+//   - req domain.ListSchoolsRequest
+func (_e *SchoolService_Expecter) ListSchools(ctx interface{}, req interface{}) *SchoolService_ListSchools_Call {
+	return &SchoolService_ListSchools_Call{Call: _e.mock.On("ListSchools", ctx, req)}
+}
+
+func (_c *SchoolService_ListSchools_Call) Run(run func(ctx context.Context, req domain.ListSchoolsRequest)) *SchoolService_ListSchools_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(domain.ListSchoolsRequest))
+	})
+	return _c
+}
+
+func (_c *SchoolService_ListSchools_Call) Return(_a0 domain.ListSchoolsResponse, _a1 error) *SchoolService_ListSchools_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *SchoolService_ListSchools_Call) RunAndReturn(run func(context.Context, domain.ListSchoolsRequest) (domain.ListSchoolsResponse, error)) *SchoolService_ListSchools_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewSchoolService creates a new instance of SchoolService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewSchoolService(t interface {
