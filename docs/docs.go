@@ -15,9 +15,45 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/schools": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "지역, 학교명으로 학교를 생성합니다. (지역, 학교명이 중복되지 않아야 합니다.)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "School"
+                ],
+                "summary": "학교 생성",
+                "parameters": [
+                    {
+                        "description": "회원가입 요청",
+                        "name": "CreateSchoolRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.CreateSchoolRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
         "/users": {
             "post": {
-                "description": "관리자, 학생의 역할로 회원가입 요청 (관리자의 경우 UserType = ADMIN, 학생의 경우 UserType = STUDENT)",
+                "description": "관리자, 학생의 역할로 회원가입 요청 (관리자의 경우 Type = ADMIN, 학생의 경우 Type = STUDENT)",
                 "consumes": [
                     "application/json"
                 ],
@@ -48,7 +84,7 @@ const docTemplate = `{
         },
         "/users/login": {
             "post": {
-                "description": "예시 유저네임: classting_admin, 비밀번호: classting, UserType = ADMIN / classting_student, 비밀번호: classting, UserType = STUDENT",
+                "description": "예시 유저네임: classting_admin, 비밀번호: classting, Type = ADMIN / classting_student, 비밀번호: classting, Type = STUDENT",
                 "consumes": [
                     "application/json"
                 ],
@@ -82,6 +118,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "domain.CreateSchoolRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "region"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "클래스팅"
+                },
+                "region": {
+                    "type": "string",
+                    "example": "서울"
+                }
+            }
+        },
         "domain.CreateUserRequest": {
             "type": "object",
             "required": [

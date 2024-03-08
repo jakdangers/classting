@@ -32,5 +32,5 @@ type User struct {
 	Base
 	UserName string
 	Password string
-	UseType  UserType
+	Type     UserType
 }

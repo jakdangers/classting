@@ -23,7 +23,7 @@ var _ domain.UserRepository = (*userRepository)(nil)
 func (u userRepository) CreateUser(ctx context.Context, user domain.User) (int, error) {
 	const op cerrors.Op = "user/userRepository/createUser"
 
-	result, err := u.sqlDB.ExecContext(ctx, createUserQuery, user.UserName, user.Password, user.UseType)
+	result, err := u.sqlDB.ExecContext(ctx, createUserQuery, user.UserName, user.Password, user.Type)
 	if err != nil {
 		return 0, cerrors.E(op, cerrors.Internal, err, "서버 에러가 발생했습니다.")
 	}
@@ -41,7 +41,7 @@ func (u userRepository) FindUserByUserName(ctx context.Context, mobileID string)
 	var user domain.User
 
 	err := u.sqlDB.QueryRowContext(ctx, findUserByUserNameQuery, mobileID).
-		Scan(&user.ID, &user.UserName, &user.Password, &user.UseType)
+		Scan(&user.ID, &user.UserName, &user.Password, &user.Type)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}

@@ -32,7 +32,7 @@ func extractInfoFromToken(token *jwt.Token) (int, domain.UserType, error) {
 
 	userTypeClaim, ok := claims["userType"]
 	if !ok {
-		return 0, "", fmt.Errorf("UserType claim not found")
+		return 0, "", fmt.Errorf("Type claim not found")
 	}
 
 	userID, ok := userIDClaim.(float64) // 여기서 적절한 타입으로 형변환 필요
@@ -40,15 +40,15 @@ func extractInfoFromToken(token *jwt.Token) (int, domain.UserType, error) {
 		return 0, "", fmt.Errorf("Invalid UserID type")
 	}
 
-	userType, ok := userTypeClaim.(domain.UserType) // 여기서 적절한 타입으로 형변환 필요
+	userType, ok := userTypeClaim.(string) // 여기서 적절한 타입으로 형변환 필요
 	if !ok {
-		return 0, "", fmt.Errorf("Invalid UserType type")
+		return 0, "", fmt.Errorf("Invalid Type type")
 	}
 
-	return int(userID), userType, nil
+	return int(userID), domain.UserType(userType), nil
 }
 
-func JWTMiddleware(secret string) gin.HandlerFunc {
+func JWTMiddleware(secret string, userTypes []domain.UserType) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -77,6 +77,15 @@ func JWTMiddleware(secret string) gin.HandlerFunc {
 			c.JSON(cerrors.NewSentinelAPIError(http.StatusUnauthorized, "올바르지 않은 토큰입니다"))
 			c.Abort()
 			return
+		}
+
+		for _, userType := range userTypes {
+			if userType != usertype {
+				fmt.Println("")
+				c.JSON(cerrors.NewSentinelAPIError(http.StatusUnauthorized, "권한이 없습니다."))
+				c.Abort()
+				return
+			}
 		}
 
 		c.Set("userID", userID)

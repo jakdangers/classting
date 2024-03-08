@@ -55,7 +55,7 @@ func Test_userRepository_CreateUser(t *testing.T) {
 				user: domain.User{
 					UserName: "classting_uniquename",
 					Password: "password",
-					UseType:  domain.UserUseTypeAdmin,
+					Type:     domain.UserUseTypeAdmin,
 				},
 			},
 			mock: func(ts userRepositoryTestSuite) {
@@ -73,7 +73,7 @@ func Test_userRepository_CreateUser(t *testing.T) {
 				user: domain.User{
 					UserName: "classting_duplicated",
 					Password: "password",
-					UseType:  domain.UserUseTypeStudent,
+					Type:     domain.UserUseTypeStudent,
 				},
 			},
 			mock: func(ts userRepositoryTestSuite) {
@@ -135,7 +135,7 @@ func Test_userRepository_FindUserByUserName(t *testing.T) {
 				},
 				UserName: "existing_user",
 				Password: "password",
-				UseType:  domain.UserUseTypeAdmin,
+				Type:     domain.UserUseTypeAdmin,
 			},
 			wantErr: false,
 		},

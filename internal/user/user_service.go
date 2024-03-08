@@ -51,7 +51,7 @@ func (us userService) CreateUser(ctx context.Context, req domain.CreateUserReque
 	_, err = us.userRepository.CreateUser(ctx, domain.User{
 		UserName: userName,
 		Password: hashedPassword,
-		UseType:  req.UserType,
+		Type:     req.UserType,
 	})
 	if err != nil {
 		return err
@@ -83,7 +83,7 @@ func (us userService) LoginUser(ctx context.Context, req domain.LoginUserRequest
 	creationTime := time.Now().UTC()
 	expirationTime := creationTime.Add(time.Hour * time.Duration(us.cfg.ExpiryHours))
 
-	accessToken, err := createAccessToken(*user, us.cfg.Auth.Secret, expirationTime)
+	accessToken, err := CreateAccessToken(*user, us.cfg.Auth.Secret, expirationTime)
 	if err != nil {
 		return domain.LoginUserResponse{}, cerrors.E(op, cerrors.Internal, err, "서버 에러가 발생했습니다.")
 	}
@@ -117,10 +117,10 @@ func validateUserName(userName string) (string, error) {
 	return userName, nil
 }
 
-func createAccessToken(user domain.User, secret string, exp time.Time) (accessToken string, err error) {
+func CreateAccessToken(user domain.User, secret string, exp time.Time) (accessToken string, err error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userID":   user.ID,
-		"userType": user.UseType,
+		"userType": user.Type,
 		"exp":      exp.Unix(),
 	})
 

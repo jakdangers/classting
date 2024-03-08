@@ -2,6 +2,7 @@ package main
 
 import (
 	"classting/config"
+	"classting/internal/school"
 	"classting/internal/user"
 	"classting/pkg/db"
 	"classting/pkg/router"
@@ -31,16 +32,20 @@ func main() {
 	router := router.NewServeRouter(cfg)
 
 	// domain
-	userRepsitory := user.NewUserRepository(db)
+	userRepository := user.NewUserRepository(db)
+	schoolRepository := school.NewSchoolRepository(db)
 
 	// service
-	userService := user.NewUserService(userRepsitory, cfg)
+	userService := user.NewUserService(userRepository, cfg)
+	schoolService := school.NewSchoolService(schoolRepository, userRepository)
 
 	// controller
 	userController := user.NewUserController(userService)
+	schoolController := school.NewSchoolController(schoolService, cfg)
 
 	// routes
 	user.RegisterRoutes(router, userController)
+	school.RegisterRoutes(router, schoolController, cfg)
 
 	// http server
 	srv := &http.Server{Addr: cfg.HTTP.Port, Handler: router}
