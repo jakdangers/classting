@@ -32,7 +32,7 @@ var _ domain.UserController = (*userController)(nil)
 // CreateUser
 // @Tags User
 // @Summary 회원가입
-// @Description 관리자, 학생의 역할로 회원가입 요청 (관리자의 경우 UserType = ADMIN, 학생의 경우 UserType = STUDENT)
+// @Description 관리자, 학생의 역할로 회원가입 요청 (관리자의 경우 Type = ADMIN, 학생의 경우 Type = STUDENT)
 // @Accept json
 // @Produce json
 // @Param CreateUserRequest body domain.CreateUserRequest true "회원가입 요청"
@@ -65,7 +65,7 @@ func (u userController) CreateUser(c *gin.Context) {
 // LoginUser
 // @Tags User
 // @Summary 로그인
-// @Description 예시 유저네임: classting_admin, 비밀번호: classting, UserType = ADMIN / classting_student, 비밀번호: classting, UserType = STUDENT
+// @Description 예시 유저네임: classting_admin, 비밀번호: classting, Type = ADMIN / classting_student, 비밀번호: classting, Type = STUDENT
 // @Accept json
 // @Produce json
 // @Param LoginUserRequest body domain.LoginUserRequest true "로그인 요청"

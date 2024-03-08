@@ -9,3 +9,16 @@ CREATE TABLE users
     delete_date TIMESTAMP NULL
 );
 
+CREATE TABLE schools
+(
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
+    region      VARCHAR(255) NOT NULL,
+    user_id     INT          NOT NULL,
+    create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    delete_date TIMESTAMP NULL,
+    UNIQUE KEY `unique_school_region` (`name`, `region`),
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+

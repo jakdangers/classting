@@ -1,4 +1,16 @@
 definitions:
+  domain.CreateSchoolRequest:
+    properties:
+      name:
+        example: 클래스팅
+        type: string
+      region:
+        example: 서울
+        type: string
+    required:
+    - name
+    - region
+    type: object
   domain.CreateUserRequest:
     properties:
       password:
@@ -51,12 +63,33 @@ definitions:
 info:
   contact: {}
 paths:
+  /schools:
+    post:
+      consumes:
+      - application/json
+      description: 지역, 학교명으로 학교를 생성합니다. (지역, 학교명이 중복되지 않아야 합니다.)
+      parameters:
+      - description: 회원가입 요청
+        in: body
+        name: CreateSchoolRequest
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateSchoolRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: 학교 생성
+      tags:
+      - School
   /users:
     post:
       consumes:
       - application/json
-      description: 관리자, 학생의 역할로 회원가입 요청 (관리자의 경우 UserType = ADMIN, 학생의 경우 UserType
-        = STUDENT)
+      description: 관리자, 학생의 역할로 회원가입 요청 (관리자의 경우 Type = ADMIN, 학생의 경우 Type = STUDENT)
       parameters:
       - description: 회원가입 요청
         in: body
@@ -76,8 +109,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: '예시 유저네임: classting_admin, 비밀번호: classting, UserType = ADMIN /
-        classting_student, 비밀번호: classting, UserType = STUDENT'
+      description: '예시 유저네임: classting_admin, 비밀번호: classting, Type = ADMIN / classting_student,
+        비밀번호: classting, Type = STUDENT'
       parameters:
       - description: 로그인 요청
         in: body

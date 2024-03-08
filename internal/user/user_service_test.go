@@ -123,7 +123,7 @@ func Test_userService_LoginUser(t *testing.T) {
 						},
 						UserName: "classting_admin",
 						Password: hashPassword,
-						UseType:  domain.UserUseTypeAdmin,
+						Type:     domain.UserUseTypeAdmin,
 					}, nil).Once()
 			},
 			wantErr: false,
@@ -146,7 +146,7 @@ func Test_userService_LoginUser(t *testing.T) {
 						},
 						UserName: "classting_admin",
 						Password: hashPassword,
-						UseType:  domain.UserUseTypeAdmin,
+						Type:     domain.UserUseTypeAdmin,
 					}, nil).Once()
 			},
 			wantErr: true,
