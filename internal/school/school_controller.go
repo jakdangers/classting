@@ -33,7 +33,7 @@ var _ domain.SchoolController = (*schoolController)(nil)
 
 // CreateSchool
 // @Tags Schools
-// @Summary 학교 생성 [필수 구현]
+// @Summary 학교 생성 [필수 구현] 권한 - 관리자
 // @Description 지역, 학교명으로 학교를 생성합니다. (지역, 학교명이 중복되지 않아야 합니다.)
 // @Accept json
 // @Produce json
@@ -73,8 +73,8 @@ func (u schoolController) CreateSchool(c *gin.Context) {
 }
 
 // ListSchools
-// @Summary 학교 목록 조회 [테스트 추가 API]
-// @Description 학교 목록을 조회합니다 (권한: 관리자, 학생) userID를 쿼리스트링에 입력시 해당 유저의 학교 목록을 조회합니다. 디폴트 20개씩 조회
+// @Summary 학교 목록 조회 [테스트 추가 API] 권한 - 관리자, 학생
+// @Description 학교 목록을 조회합니다  userID를 쿼리스트링에 입력시 해당 유저의 학교 목록을 조회합니다. 디폴트 20개씩 조회
 // @Tags Schools
 // @Produce json
 // @Security BearerAuth

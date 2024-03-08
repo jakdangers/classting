@@ -30,13 +30,9 @@ func (s schoolService) CreateSchool(ctx context.Context, req domain.CreateSchool
 		Name:   req.Name,
 		Region: req.Region,
 	})
-	if err != nil {
-		return err
-	}
 	if school != nil {
 		return cerrors.E(op, cerrors.Invalid, "이미 사용중인 지역, 학교명입니다.")
 	}
-
 	if err != nil {
 		return cerrors.E(op, cerrors.Internal, err, "서버 에러가 발생했습니다.")
 	}

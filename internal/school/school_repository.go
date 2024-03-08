@@ -86,3 +86,19 @@ func (s schoolRepository) FindSchoolByNameAndRegion(ctx context.Context, params 
 
 	return &school, nil
 }
+
+func (s schoolRepository) FindSchoolByID(ctx context.Context, schoolID int) (*domain.School, error) {
+	const op cerrors.Op = "school/schoolRepository/FindSchoolByID"
+	var school domain.School
+
+	err := s.sqlDB.QueryRowContext(ctx, findSchoolByID, schoolID).
+		Scan(&school.ID, &school.UserID, &school.Name, &school.Region)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, cerrors.E(op, cerrors.Internal, err, "서버 에러가 발생했습니다.")
+	}
+
+	return &school, nil
+}

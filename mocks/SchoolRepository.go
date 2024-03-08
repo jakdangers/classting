@@ -75,6 +75,61 @@ func (_c *SchoolRepository_CreateSchool_Call) RunAndReturn(run func(context.Cont
 	return _c
 }
 
+// FindSchoolByID provides a mock function with given fields: ctx, schoolID
+func (_m *SchoolRepository) FindSchoolByID(ctx context.Context, schoolID int) (*domain.School, error) {
+	ret := _m.Called(ctx, schoolID)
+
+	var r0 *domain.School
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, int) (*domain.School, error)); ok {
+		return rf(ctx, schoolID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, int) *domain.School); ok {
+		r0 = rf(ctx, schoolID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.School)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, int) error); ok {
+		r1 = rf(ctx, schoolID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SchoolRepository_FindSchoolByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindSchoolByID'
+type SchoolRepository_FindSchoolByID_Call struct {
+	*mock.Call
+}
+
+// FindSchoolByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - schoolID int
+func (_e *SchoolRepository_Expecter) FindSchoolByID(ctx interface{}, schoolID interface{}) *SchoolRepository_FindSchoolByID_Call {
+	return &SchoolRepository_FindSchoolByID_Call{Call: _e.mock.On("FindSchoolByID", ctx, schoolID)}
+}
+
+func (_c *SchoolRepository_FindSchoolByID_Call) Run(run func(ctx context.Context, schoolID int)) *SchoolRepository_FindSchoolByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(int))
+	})
+	return _c
+}
+
+func (_c *SchoolRepository_FindSchoolByID_Call) Return(_a0 *domain.School, _a1 error) *SchoolRepository_FindSchoolByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *SchoolRepository_FindSchoolByID_Call) RunAndReturn(run func(context.Context, int) (*domain.School, error)) *SchoolRepository_FindSchoolByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // FindSchoolByNameAndRegion provides a mock function with given fields: ctx, params
 func (_m *SchoolRepository) FindSchoolByNameAndRegion(ctx context.Context, params domain.FindSchoolByNameAndRegionParams) (*domain.School, error) {
 	ret := _m.Called(ctx, params)
