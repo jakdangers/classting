@@ -29,12 +29,12 @@ func (n newsRepository) CreateNews(ctx context.Context, news domain.News) (int, 
 		return 0, cerrors.E(op, cerrors.Internal, err, "서버 에러가 발생했습니다.")
 	}
 
-	userID, err := result.LastInsertId()
+	newID, err := result.LastInsertId()
 	if err != nil {
 		return 0, cerrors.E(op, cerrors.Internal, err, "서버 에러가 발생했습니다.")
 	}
 
-	return int(userID), nil
+	return int(newID), nil
 }
 
 func (n newsRepository) ListNews(ctx context.Context, params domain.ListNewsParams) ([]domain.News, error) {
@@ -42,9 +42,13 @@ func (n newsRepository) ListNews(ctx context.Context, params domain.ListNewsPara
 
 	var news []domain.News
 
-	query := fmt.Sprintf(listNewsQuery, params.AfterCursor())
+	query := fmt.Sprintf(listNewsQuery,
+		params.AndSchoolID(),
+		params.AndUserID(),
+		params.AfterCursor(),
+	)
 
-	rows, err := n.sqlDB.QueryContext(ctx, query, params.UserID)
+	rows, err := n.sqlDB.QueryContext(ctx, query)
 	if err != nil {
 		return nil, cerrors.E(op, cerrors.Internal, err, "서버 에러가 발생했습니다.")
 	}

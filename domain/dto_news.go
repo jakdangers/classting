@@ -31,12 +31,17 @@ func (req CreateNewsRequest) Validate() error {
 }
 
 type ListNewsRequest struct {
-	UserID int  `swaggerignore:"true"`
-	Cursor *int `form:"cursor" validate:"optional" example:"1"`
+	UserID   int  `swaggerignore:"true"`
+	SchoolID int  `form:"schoolID" validate:"required" example:"1"`
+	Cursor   *int `form:"cursor" validate:"optional" example:"1"`
 }
 
 func (req ListNewsRequest) Validate() error {
 	const op cerrors.Op = "domain/ListNewsRequest.Validate"
+
+	if req.SchoolID <= 0 {
+		return cerrors.E(op, cerrors.Invalid, "학교 ID를 확인해주세요.")
+	}
 
 	if req.Cursor != nil && *req.Cursor <= 0 {
 		return cerrors.E(op, cerrors.Invalid, "커서를 확인해주세요.")

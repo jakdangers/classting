@@ -143,12 +143,14 @@ func Test_newsController_ListNews(t *testing.T) {
 			name: "PASS - 전체 조회 (커서 미 입력)",
 			query: func() string {
 				params := url.Values{}
+				params.Add("schoolID", "1")
 				return params.Encode()
 			},
 			mock: func(ts newsControllerTestSuite) {
 				ts.newsService.EXPECT().ListNews(mock.Anything, domain.ListNewsRequest{
-					UserID: 1,
-					Cursor: nil,
+					UserID:   1,
+					SchoolID: 1,
+					Cursor:   nil,
 				}).Return(domain.ListNewsResponse{}, nil).Once()
 			},
 			code: http.StatusOK,
@@ -158,12 +160,14 @@ func Test_newsController_ListNews(t *testing.T) {
 			query: func() string {
 				params := url.Values{}
 				params.Add("cursor", "1")
+				params.Add("schoolID", "1")
 				return params.Encode()
 			},
 			mock: func(ts newsControllerTestSuite) {
 				ts.newsService.EXPECT().ListNews(mock.Anything, domain.ListNewsRequest{
-					UserID: 1,
-					Cursor: pointer.Int(1),
+					UserID:   1,
+					SchoolID: 1,
+					Cursor:   pointer.Int(1),
 				}).Return(domain.ListNewsResponse{}, nil).Once()
 			},
 			code: http.StatusOK,
