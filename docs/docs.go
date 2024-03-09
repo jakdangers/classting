@@ -14,7 +14,716 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {},
+    "paths": {
+        "/news": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "소유하고 있는 학교 소식 목록을 조회합니다. (학교 ID로 조회 가능, 커서로 페이징 가능) 10개씩 조회합니다.\nclassting_admin_1은 schoolID 1, 2의 소식을 조회할 수 있습니다.\nclassting_admin_2은 schoolID 3의 소식을 조회할 수 있습니다.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "News"
+                ],
+                "summary": "학교 소식 목록 조회 [테스트 도우미] 권한 - 관리자",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "커서",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "학교 ID",
+                        "name": "schoolID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "학교 목록",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ListNewsResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "자신이 소유한 학교의 소식을 수정합니다 (소식ID로 소식을 수정합니다).\nid는 소식ID, title은 소식 제목\nclassting_admin_1은 schoolID 1, 2의 소식을 수정할 수 있습니다. 미리 삽입된 데이터 아이디(공백으로 구분) : 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16\nclassting_admin_2은 schoolID 3의 소식을 수정할 수 있습니다. 미리 삽입된 데이터 아이디(공백으로 구분) : 17",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "News"
+                ],
+                "summary": "소식 수정 [필수 구현] 권한 - 관리자",
+                "parameters": [
+                    {
+                        "description": "소식 수정 요청",
+                        "name": "UpdateNewsRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.UpdateNewsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "자신이 소유한 학교의 소식을 생성합니다.\nschoolID는 학교 아이디, title은 소식 제목\nclassting_admin_1은 schoolID 1, 2의 소식을 생성할 수 있습니다.\nclassting_admin_2은 schoolID 3의 소식을 생성할 수 있습니다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "News"
+                ],
+                "summary": "소식 생성 [필수 구현] 권한 - 관리자",
+                "parameters": [
+                    {
+                        "description": "소식 생성 요청",
+                        "name": "CreateNewsRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.CreateNewsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/news/{newsID}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "자신이 소유한 학교의 소식을 삭제합니다 (소식ID로 소식을 삭제합니다).\nclassting_admin_1은 schoolID 1, 2의 소식을 삭제할 수 있습니다. 미리 삽입된 데이터 아이디(공백으로 구분) : 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16\nclassting_admin_2은 schoolID 3의 소식을 삭제할 수 있습니다. 미리 삽입된 데이터 아이디(공백으로 구분) : 17",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "News"
+                ],
+                "summary": "소식 삭제 [필수 구현] 권한 - 관리자",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "소식 ID",
+                        "name": "newsID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/schools": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "학교의 목록을 조회합니다. (커서를 통해 페이징 가능)\n유저 아이디를 통해 해당 유저가 소유한 학교인지 확인합니다.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Schools"
+                ],
+                "summary": "학교 목록 조회 [테스트 추가 API] 권한 - 관리자, 학생",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "커서",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "유저 아이디",
+                        "name": "userID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "학교 목록",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ListSchoolsResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "지역, 학교명으로 학교를 생성합니다. (지역, 학교명이 중복되지 않아야 합니다.)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Schools"
+                ],
+                "summary": "학교 생성 [필수 구현] 권한 - 관리자",
+                "parameters": [
+                    {
+                        "description": "학교 생성 요청",
+                        "name": "CreateSchoolRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.CreateSchoolRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/subscriptions": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "구독 중인 학교 목록을 10개씩 조회합니다\t(커서로 페이징 가능)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "구독 중인 학교 목록 조회 [필수 구현] 권한 - 학생",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "커서",
+                        "name": "cursor",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "구독 학교 목록",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ListSubscriptionSchoolsResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "학교ID로 구독을 생성합니다.\nclassting_admin_1의 schoolID 1, 2을 구독 할 수 있습니다.\nclassting_admin_2의 schoolID 3을 구독 할 수 있습니다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "구독 생성 [필수 구현] 권한 - 학생",
+                "parameters": [
+                    {
+                        "description": "구독 생성 요청",
+                        "name": "CreateSubscriptionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.CreateSubscriptionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/subscriptions/news/{schoolID}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "구독 중인 각각의 학교 페이지 소식을 10개씩 조회합니다 (커서로 페이징 가능)\nid을 기준으로 최신 소식순으로 조회합니다.\nclassting_student_1은 schoolID 1, 2, 3의 소식을 조회할 수 있습니다.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "구독 중인 학교 페이지별 소식 조회 [필수 구현] 권한 - 학생",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "커서",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "학교 ID",
+                        "name": "schoolID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "구독 중인 학교 페이지별 소식 조회",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ListSubscriptionSchoolNewsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/subscriptions/{schoolID}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "학교 ID로 구독을 취소합니다.\nclassting_admin_1의 schoolID 1, 2, 3을 구독 취소 할 수 있습니다.\n그 외 구독 학교 페이징을 위한 구독 4 ~ 23을 구독 취소 할 수 있습니다.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "구독 취소 [필수 구현] 권한 - 학생",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "학교 ID",
+                        "name": "schoolID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "post": {
+                "description": "관리자, 학생의 역할로 회원가입 요청 (관리자의 경우 Type = ADMIN, 학생의 경우 Type = STUDENT)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "회원가입 [테스트 추가 API]",
+                "parameters": [
+                    {
+                        "description": "회원가입 요청",
+                        "name": "CreateUserRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "description": "관리자 계정 classting_admin_1, classting_admin_2, classting_admin_3, empty_classting_admin\n학생 계정 classting_student_1, empty_classting_student\n비밀번호는 모두 1234 입니다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "로그인 [테스트 추가 API]",
+                "parameters": [
+                    {
+                        "description": "로그인 요청",
+                        "name": "LoginUserRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.LoginUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.LoginUserResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "domain.CreateNewsRequest": {
+            "type": "object",
+            "properties": {
+                "schoolID": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.CreateSchoolRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "region"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "클래스팅"
+                },
+                "region": {
+                    "type": "string",
+                    "example": "서울"
+                }
+            }
+        },
+        "domain.CreateSubscriptionRequest": {
+            "type": "object",
+            "required": [
+                "schoolID"
+            ],
+            "properties": {
+                "schoolID": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "domain.CreateUserRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "userName",
+                "userType"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "1234"
+                },
+                "userName": {
+                    "type": "string",
+                    "example": "classting_admin"
+                },
+                "userType": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.UserType"
+                        }
+                    ],
+                    "example": "ADMIN"
+                }
+            }
+        },
+        "domain.ListNewsResponse": {
+            "type": "object",
+            "properties": {
+                "cursor": {
+                    "type": "integer"
+                },
+                "news": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.NewsDTO"
+                    }
+                }
+            }
+        },
+        "domain.ListSchoolsResponse": {
+            "type": "object",
+            "properties": {
+                "cursor": {
+                    "type": "integer"
+                },
+                "schools": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.SchoolDTO"
+                    }
+                }
+            }
+        },
+        "domain.ListSubscriptionSchoolNewsResponse": {
+            "type": "object",
+            "properties": {
+                "cursor": {
+                    "type": "integer"
+                },
+                "subscriptionSchoolNews": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.SubscriptionSchoolNewsDTO"
+                    }
+                }
+            }
+        },
+        "domain.ListSubscriptionSchoolsResponse": {
+            "type": "object",
+            "properties": {
+                "cursor": {
+                    "type": "integer"
+                },
+                "subscriptionSchools": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.SubscriptionSchoolDTO"
+                    }
+                }
+            }
+        },
+        "domain.LoginUserRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "userName"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "1234"
+                },
+                "userName": {
+                    "type": "string",
+                    "example": "classting_admin"
+                }
+            }
+        },
+        "domain.LoginUserResponse": {
+            "type": "object",
+            "required": [
+                "accessToken",
+                "expiresIn"
+            ],
+            "properties": {
+                "accessToken": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDg4ODgxOTIsInVzZXJJRCI6MX0.WVQGpeNbCpWSKuvYO7rFv6HoXaEA4_VQZSl7oMhmROk"
+                },
+                "expiresIn": {
+                    "type": "integer",
+                    "example": 1708888192
+                }
+            }
+        },
+        "domain.NewsDTO": {
+            "type": "object",
+            "required": [
+                "createDate",
+                "id",
+                "updateDate"
+            ],
+            "properties": {
+                "createDate": {
+                    "type": "string",
+                    "example": "2024-02-28T15:04:05Z"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "schoolID": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updateDate": {
+                    "type": "string",
+                    "example": "2024-02-28T15:04:05Z"
+                }
+            }
+        },
+        "domain.SchoolDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.SubscriptionSchoolDTO": {
+            "type": "object",
+            "required": [
+                "createDate",
+                "id",
+                "name",
+                "region",
+                "schoolID",
+                "updateDate"
+            ],
+            "properties": {
+                "createDate": {
+                    "type": "string",
+                    "example": "2024-02-28T15:04:05Z"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "클래스팅"
+                },
+                "region": {
+                    "type": "string",
+                    "example": "서울"
+                },
+                "schoolID": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "updateDate": {
+                    "type": "string",
+                    "example": "2024-02-28T15:04:05Z"
+                }
+            }
+        },
+        "domain.SubscriptionSchoolNewsDTO": {
+            "type": "object",
+            "required": [
+                "createDate",
+                "id",
+                "schoolID",
+                "title",
+                "updateDate"
+            ],
+            "properties": {
+                "createDate": {
+                    "type": "string",
+                    "example": "2024-02-28T15:04:05Z"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "schoolID": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "type": "string",
+                    "example": "클래스팅 새소식"
+                },
+                "updateDate": {
+                    "type": "string",
+                    "example": "2024-02-28T15:04:05Z"
+                }
+            }
+        },
+        "domain.UpdateNewsRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UserType": {
+            "type": "string",
+            "enum": [
+                "ADMIN",
+                "STUDENT"
+            ],
+            "x-enum-varnames": [
+                "UserUseTypeAdmin",
+                "UserUseTypeStudent"
+            ]
+        }
+    },
     "securityDefinitions": {
         "BearerAuth": {
             "type": "apiKey",

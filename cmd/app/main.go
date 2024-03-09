@@ -2,6 +2,10 @@ package main
 
 import (
 	"classting/config"
+	"classting/internal/news"
+	"classting/internal/school"
+	"classting/internal/subscription"
+	"classting/internal/user"
 	"classting/pkg/db"
 	"classting/pkg/router"
 	"context"
@@ -23,11 +27,35 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = db.NewSql(cfg)
+	db, err := db.NewSql(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 	router := router.NewServeRouter(cfg)
+
+	// domain
+	userRepository := user.NewUserRepository(db)
+	schoolRepository := school.NewSchoolRepository(db)
+	newsRepository := news.NewNewsRepository(db)
+	subscriptionRepository := subscription.NewSubscriptionRepository(db)
+
+	// service
+	userService := user.NewUserService(userRepository, cfg)
+	schoolService := school.NewSchoolService(schoolRepository, userRepository)
+	newsService := news.NewNewsService(newsRepository, schoolRepository)
+	subscriptionService := subscription.NewSubscriptionService(newsRepository, schoolRepository, subscriptionRepository)
+
+	// controller
+	userController := user.NewUserController(userService)
+	schoolController := school.NewSchoolController(schoolService, cfg)
+	newsController := news.NewNewsController(newsService)
+	subscriptionController := subscription.NewSubscriptionController(subscriptionService)
+
+	// routes
+	user.RegisterRoutes(router, userController)
+	school.RegisterRoutes(router, schoolController, cfg)
+	news.RegisterRoutes(router, newsController, cfg)
+	subscription.RegisterRoutes(router, subscriptionController, cfg)
 
 	// http server
 	srv := &http.Server{Addr: cfg.HTTP.Port, Handler: router}
@@ -43,7 +71,7 @@ func main() {
 	<-quit
 	log.Println("Shutdown Server ...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal("Server Shutdown:", err)
@@ -51,7 +79,7 @@ func main() {
 
 	select {
 	case <-ctx.Done():
-		log.Println("timeout of 5 seconds.")
+		log.Println("timeout of 1 seconds.")
 	}
 	log.Println("Server exiting")
 }
