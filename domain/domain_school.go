@@ -53,5 +53,5 @@ func (lp ListSchoolsParams) AfterCursor() string {
 		return ""
 	}
 
-	return fmt.Sprintf("AND id > %d", *lp.Cursor)
+	return fmt.Sprintf("AND id < %d", *lp.Cursor)
 }

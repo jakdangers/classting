@@ -74,7 +74,8 @@ func (u schoolController) CreateSchool(c *gin.Context) {
 
 // ListSchools
 // @Summary 학교 목록 조회 [테스트 추가 API] 권한 - 관리자, 학생
-// @Description 학교 목록을 조회합니다  userID를 쿼리스트링에 입력시 해당 유저의 학교 목록을 조회합니다. 디폴트 20개씩 조회
+// @Description 학교의 목록을 조회 합니다 커서기반 페이징 id을 기반으로 최신순 정렬
+// @Description 유저 아이디를 통해 해당 유저가 소유한 학교인지 확인합니다.
 // @Tags Schools
 // @Produce json
 // @Security BearerAuth

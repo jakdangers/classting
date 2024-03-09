@@ -37,6 +37,8 @@ var _ domain.SubscriptionController = (*subscriptionController)(nil)
 // @Tags Subscription
 // @Summary 구독 생성 [필수 구현] 권한 - 학생
 // @Description 학교ID로 구독을 생성합니다.
+// @Description classting_admin_1의 schoolID 1, 2을 구독 할 수 있습니다.
+// @Description classting_admin_2의 schoolID 3을 구독 할 수 있습니다.
 // @Accept json
 // @Produce json
 // @Security BearerAuth
@@ -76,7 +78,7 @@ func (n subscriptionController) CreateSubscription(c *gin.Context) {
 
 // ListSubscriptionSchools
 // @Summary 구독 중인 학교 목록 조회 [필수 구현] 권한 - 학생
-// @Description 구독 학교 목록을 20개씩 조회합니다
+// @Description 구독 중인 학교 목록을 10개씩 조회합니다	(커서로 페이징 가능)
 // @Tags Subscription
 // @Produce json
 // @Security BearerAuth
@@ -117,6 +119,8 @@ func (n subscriptionController) ListSubscriptionSchools(c *gin.Context) {
 // DeleteSubscription
 // @Summary 구독 취소 [필수 구현] 권한 - 학생
 // @Description 학교 ID로 구독을 취소합니다.
+// @Description classting_admin_1의 schoolID 1, 2, 3을 구독 취소 할 수 있습니다.
+// @Description 그 외 구독 학교 페이징을 위한 구독 4 ~ 23을 구독 취소 할 수 있습니다.
 // @Tags Subscription
 // @Produce json
 // @Param schoolID path int true "학교 ID"
@@ -156,7 +160,9 @@ func (n subscriptionController) DeleteSubscription(c *gin.Context) {
 
 // ListSubscriptionSchoolNews
 // @Summary 구독 중인 학교 페이지별 소식 조회 [필수 구현] 권한 - 학생
-// @Description 구독 중인 학교 페이지별 소식을 20개씩 조회합니다
+// @Description 구독 중인 각각의 학교 페이지 소식을 10개씩 조회합니다 (커서로 페이징 가능)
+// @Description id을 기준으로 최신 소식순으로 조회합니다.
+// @Description classting_student_1은 schoolID 1, 2, 3의 소식을 조회할 수 있습니다.
 // @Tags Subscription
 // @Produce json
 // @Security BearerAuth
