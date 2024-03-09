@@ -80,7 +80,7 @@ func JWTMiddleware(secret string, userTypes []domain.UserType) gin.HandlerFunc {
 			return
 		}
 
-		if !lo.Contains([]domain.UserType{domain.UserUseTypeAdmin, domain.UserUseTypeStudent}, usertype) {
+		if !lo.Contains(userTypes, usertype) {
 			c.JSON(cerrors.NewSentinelAPIError(http.StatusUnauthorized, "권한이 없습니다."))
 			c.Abort()
 			return

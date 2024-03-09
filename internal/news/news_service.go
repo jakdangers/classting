@@ -4,6 +4,7 @@ import (
 	"classting/domain"
 	"classting/pkg/cerrors"
 	"context"
+	"k8s.io/utils/pointer"
 )
 
 type newsService struct {
@@ -53,8 +54,9 @@ func (s newsService) ListNews(ctx context.Context, req domain.ListNewsRequest) (
 	const op cerrors.Op = "news/service/ListNews"
 
 	news, err := s.newsRepository.ListNews(ctx, domain.ListNewsParams{
-		UserID: req.UserID,
-		Cursor: req.Cursor,
+		UserID:   pointer.Int(req.UserID),
+		SchoolID: pointer.Int(req.SchoolID),
+		Cursor:   req.Cursor,
 	})
 	if err != nil {
 		return domain.ListNewsResponse{}, cerrors.E(op, cerrors.Internal, err, "소식을 조회하는 중에 에러가 발생했습니다.")

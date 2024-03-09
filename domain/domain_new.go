@@ -36,8 +36,25 @@ type News struct {
 }
 
 type ListNewsParams struct {
-	UserID int
-	Cursor *int
+	UserID   *int
+	SchoolID *int
+	Cursor   *int
+}
+
+func (lp ListNewsParams) AndSchoolID() string {
+	if lp.SchoolID == nil {
+		return ""
+	}
+
+	return fmt.Sprintf("AND school_id = %d", *lp.SchoolID)
+}
+
+func (lp ListNewsParams) AndUserID() string {
+	if lp.UserID == nil {
+		return ""
+	}
+
+	return fmt.Sprintf("AND user_id = %d", *lp.UserID)
 }
 
 func (lp ListNewsParams) AfterCursor() string {
@@ -45,5 +62,5 @@ func (lp ListNewsParams) AfterCursor() string {
 		return ""
 	}
 
-	return fmt.Sprintf("AND id > %d", *lp.Cursor)
+	return fmt.Sprintf("AND id < %d", *lp.Cursor)
 }

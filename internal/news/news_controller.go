@@ -36,7 +36,10 @@ var _ domain.NewsController = (*newsController)(nil)
 // CreateNews
 // @Tags News
 // @Summary 소식 생성 [필수 구현] 권한 - 관리자
-// @Description 학교ID, 제목으로 소식을 생성 (자신의 학교에만 소식을 생성할 수 있음, 학교를 여러개 소유 할 수 있으므로 학교 ID 필요)
+// @Description 자신이 소유한 학교의 소식을 생성합니다.
+// @Description schoolID는 학교 아이디, title은 소식 제목
+// @Description classting_admin_1은 schoolID 1, 2의 소식을 생성할 수 있습니다.
+// @Description classting_admin_2은 schoolID 3의 소식을 생성할 수 있습니다.
 // @Accept json
 // @Produce json
 // @Security BearerAuth
@@ -76,11 +79,14 @@ func (n newsController) CreateNews(c *gin.Context) {
 
 // ListNews
 // @Summary 학교 소식 목록 조회 [필수 구현] 권한 - 관리자
-// @Description 학교 소식 목록을 20개씩 조회합니다
+// @Description 소유하고 있는 학교 소식 목록을 조회합니다. (학교 ID로 조회 가능, 커서로 페이징 가능) 10개씩 조회합니다.
+// @Description classting_admin_1은 schoolID 1, 2의 소식을 조회할 수 있습니다.
+// @Description classting_admin_2은 schoolID 3의 소식을 조회할 수 있습니다.
 // @Tags News
 // @Produce json
 // @Security BearerAuth
 // @Param cursor query int false "커서"
+// @Param schoolID query int false "학교 ID"
 // @Success 200 {object} domain.ListNewsResponse "학교 목록"
 // @Router /news [get]
 func (n newsController) ListNews(c *gin.Context) {
@@ -116,7 +122,10 @@ func (n newsController) ListNews(c *gin.Context) {
 
 // UpdateNews
 // @Summary 소식 수정 [필수 구현] 권한 - 관리자
-// @Description 학교 소식을 수정 (단 자신의 학교 소식만 수정 가능)
+// @Description 자신이 소유한 학교의 소식을 수정합니다 (소식ID로 소식을 수정합니다).
+// @Description id는 소식ID, title은 소식 제목
+// @Description classting_admin_1은 schoolID 1, 2의 소식을 수정할 수 있습니다. 미리 삽입된 데이터 아이디(공백으로 구분) : 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+// @Description classting_admin_2은 schoolID 3의 소식을 수정할 수 있습니다. 미리 삽입된 데이터 아이디(공백으로 구분) : 17
 // @Tags News
 // @Accept json
 // @Produce json
@@ -157,7 +166,9 @@ func (n newsController) UpdateNews(c *gin.Context) {
 
 // DeleteNews
 // @Summary 소식 삭제 [필수 구현] 권한 - 관리자
-// @Description 소식 ID로 상품을 삭제합니다. (단 자신의 학교 소식만 삭제 가능)
+// @Description 자신이 소유한 학교의 소식을 삭제합니다 (소식ID로 소식을 삭제합니다).
+// @Description classting_admin_1은 schoolID 1, 2의 소식을 삭제할 수 있습니다. 미리 삽입된 데이터 아이디(공백으로 구분) : 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+// @Description classting_admin_2은 schoolID 3의 소식을 삭제할 수 있습니다. 미리 삽입된 데이터 아이디(공백으로 구분) : 17
 // @Tags News
 // @Produce json
 // @Param newsID path int true "소식 ID"

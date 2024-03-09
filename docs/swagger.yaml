@@ -18,6 +18,14 @@ definitions:
     - name
     - region
     type: object
+  domain.CreateSubscriptionRequest:
+    properties:
+      schoolID:
+        example: 1
+        type: integer
+    required:
+    - schoolID
+    type: object
   domain.CreateUserRequest:
     properties:
       password:
@@ -51,6 +59,24 @@ definitions:
       schools:
         items:
           $ref: '#/definitions/domain.SchoolDTO'
+        type: array
+    type: object
+  domain.ListSubscriptionSchoolNewsResponse:
+    properties:
+      cursor:
+        type: integer
+      subscriptionSchoolNews:
+        items:
+          $ref: '#/definitions/domain.SubscriptionSchoolNewsDTO'
+        type: array
+    type: object
+  domain.ListSubscriptionSchoolsResponse:
+    properties:
+      cursor:
+        type: integer
+      subscriptionSchools:
+        items:
+          $ref: '#/definitions/domain.SubscriptionSchoolDTO'
         type: array
     type: object
   domain.LoginUserRequest:
@@ -106,6 +132,58 @@ definitions:
       region:
         type: string
     type: object
+  domain.SubscriptionSchoolDTO:
+    properties:
+      createDate:
+        example: "2024-02-28T15:04:05Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: 클래스팅
+        type: string
+      region:
+        example: 서울
+        type: string
+      schoolID:
+        example: 1
+        type: integer
+      updateDate:
+        example: "2024-02-28T15:04:05Z"
+        type: string
+    required:
+    - createDate
+    - id
+    - name
+    - region
+    - schoolID
+    - updateDate
+    type: object
+  domain.SubscriptionSchoolNewsDTO:
+    properties:
+      createDate:
+        example: "2024-02-28T15:04:05Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      schoolID:
+        example: 1
+        type: integer
+      title:
+        example: 클래스팅 새소식
+        type: string
+      updateDate:
+        example: "2024-02-28T15:04:05Z"
+        type: string
+    required:
+    - createDate
+    - id
+    - schoolID
+    - title
+    - updateDate
+    type: object
   domain.UpdateNewsRequest:
     properties:
       id:
@@ -126,11 +204,19 @@ info:
 paths:
   /news:
     get:
-      description: 학교 소식 목록을 20개씩 조회합니다
+      description: |-
+        소유하고 있는 학교 소식 목록을 조회합니다. (학교 ID로 조회 가능, 커서로 페이징 가능)
+        schoolID 1     admin_1_뉴스가_있는_클래스팅 서울학교
+        schoolID 2     admin_1_뉴스가_있는_클래스팅 대전학교
+        schoolID 3     admin_2_뉴스가_있는_클래스팅 다른 인천학교
       parameters:
       - description: 커서
         in: query
         name: cursor
+        type: integer
+      - description: 학교 ID
+        in: query
+        name: schoolID
         type: integer
       produces:
       - application/json
@@ -147,8 +233,11 @@ paths:
     post:
       consumes:
       - application/json
-      description: 학교ID, 제목으로 소식을 생성 (자신의 학교에만 소식을 생성할 수 있음, 학교를 여러개 소유 할 수 있으므로 학교
-        ID 필요)
+      description: |-
+        자신이 소유한 학교의 소식을 생성합니다.
+        schoolID는 학교 아이디, title은 소식 제목
+        classting_admin_1은 schoolID 1, 2의 소식을 생성할 수 있습니다.
+        classting_admin_2은 schoolID 3의 소식을 생성할 수 있습니다.
       parameters:
       - description: 소식 생성 요청
         in: body
@@ -169,7 +258,11 @@ paths:
     put:
       consumes:
       - application/json
-      description: 학교 소식을 수정 (단 자신의 학교 소식만 수정 가능)
+      description: |-
+        자신이 소유한 학교의 소식을 수정합니다 (소식ID로 소식을 수정합니다).
+        id는 소식ID, title은 소식 제목
+        classting_admin_1은 schoolID 1, 2의 소식을 수정할 수 있습니다.
+        classting_admin_2은 schoolID 3의 소식을 수정할 수 있습니다.
       parameters:
       - description: 소식 수정 요청
         in: body
@@ -189,7 +282,10 @@ paths:
       - News
   /news/{newsID}:
     delete:
-      description: 소식 ID로 상품을 삭제합니다. (단 자신의 학교 소식만 삭제 가능)
+      description: |-
+        자신이 소유한 학교의 소식을 삭제합니다 (소식ID로 소식을 삭제합니다).
+        classting_admin_1은 schoolID 1, 2의 소식을 삭제할 수 있습니다. 미리 삽입된 데이터 아이디 : 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+        classting_admin_2은 schoolID 3의 소식을 삭제할 수 있습니다. 미리 삽입된 데이터 아이디 : 17
       parameters:
       - description: 소식 ID
         in: path
@@ -252,6 +348,91 @@ paths:
       summary: 학교 생성 [필수 구현] 권한 - 관리자
       tags:
       - Schools
+  /subscriptions:
+    get:
+      description: 구독 학교 목록을 20개씩 조회합니다
+      parameters:
+      - description: 커서
+        in: query
+        name: cursor
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 구독 학교 목록
+          schema:
+            $ref: '#/definitions/domain.ListSubscriptionSchoolsResponse'
+      security:
+      - BearerAuth: []
+      summary: 구독 중인 학교 목록 조회 [필수 구현] 권한 - 학생
+      tags:
+      - Subscription
+    post:
+      consumes:
+      - application/json
+      description: 학교ID로 구독을 생성합니다.
+      parameters:
+      - description: 구독 생성 요청
+        in: body
+        name: CreateSubscriptionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateSubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: 구독 생성 [필수 구현] 권한 - 학생
+      tags:
+      - Subscription
+  /subscriptions/{schoolID}:
+    delete:
+      description: 학교 ID로 구독을 취소합니다.
+      parameters:
+      - description: 학교 ID
+        in: path
+        name: schoolID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: 구독 취소 [필수 구현] 권한 - 학생
+      tags:
+      - Subscription
+  /subscriptions/news/{schoolID}:
+    get:
+      description: 구독 중인 학교 페이지별 소식을 20개씩 조회합니다
+      parameters:
+      - description: 커서
+        in: query
+        name: cursor
+        type: integer
+      - description: 학교 ID
+        in: path
+        name: schoolID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 구독 중인 학교 페이지별 소식 조회
+          schema:
+            $ref: '#/definitions/domain.ListSubscriptionSchoolNewsResponse'
+      security:
+      - BearerAuth: []
+      summary: 구독 중인 학교 페이지별 소식 조회 [필수 구현] 권한 - 학생
+      tags:
+      - Subscription
   /users:
     post:
       consumes:
@@ -276,8 +457,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: '예시 유저네임: classting_admin, 비밀번호: classting, Type = ADMIN / classting_student,
-        비밀번호: classting, Type = STUDENT'
+      description: 관리자 계정 classting_admin_1, classting_admin_2, classting_admin_3,
+        empty_classting_admin 학생 계정 classting_student_1, empty_classting_student 비밀번호는
+        모두 1234 입니다.
       parameters:
       - description: 로그인 요청
         in: body

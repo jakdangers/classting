@@ -126,14 +126,16 @@ func Test_newsService_ListNews(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				req: domain.ListNewsRequest{
-					UserID: 1,
-					Cursor: nil,
+					UserID:   1,
+					SchoolID: 1,
+					Cursor:   nil,
 				},
 			},
 			mock: func(ts newsServiceTestSuite) {
 				ts.newsRepository.EXPECT().ListNews(mock.Anything, domain.ListNewsParams{
-					UserID: 1,
-					Cursor: nil,
+					UserID:   pointer.Int(1),
+					SchoolID: pointer.Int(1),
+					Cursor:   nil,
 				}).Return([]domain.News{
 					{
 						Base: domain.Base{
@@ -164,14 +166,16 @@ func Test_newsService_ListNews(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				req: domain.ListNewsRequest{
-					UserID: 1,
-					Cursor: pointer.Int(1),
+					UserID:   1,
+					SchoolID: 1,
+					Cursor:   pointer.Int(1),
 				},
 			},
 			mock: func(ts newsServiceTestSuite) {
 				ts.newsRepository.EXPECT().ListNews(mock.Anything, domain.ListNewsParams{
-					UserID: 1,
-					Cursor: pointer.Int(1),
+					UserID:   pointer.Int(1),
+					SchoolID: pointer.Int(1),
+					Cursor:   pointer.Int(1),
 				}).Return([]domain.News{
 					{
 						Base: domain.Base{

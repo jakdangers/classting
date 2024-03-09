@@ -65,7 +65,7 @@ func (u userController) CreateUser(c *gin.Context) {
 // LoginUser
 // @Tags User
 // @Summary 로그인 [테스트 추가 API]
-// @Description 예시 유저네임: classting_admin, 비밀번호: classting, Type = ADMIN / classting_student, 비밀번호: classting, Type = STUDENT
+// @Description 관리자 계정 classting_admin_1, classting_admin_2, classting_admin_3, empty_classting_admin 학생 계정 classting_student_1, empty_classting_student 비밀번호는 모두 1234 입니다.
 // @Accept json
 // @Produce json
 // @Param LoginUserRequest body domain.LoginUserRequest true "로그인 요청"

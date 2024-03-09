@@ -108,14 +108,14 @@ func Test_newsRepository_ListNews(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				params: domain.ListNewsParams{
-					UserID: 1,
+					UserID: pointer.Int(1),
 				},
 			},
 			mock: func(ts newsRepositoryTestSuite) {
 				query := `SELECT id, create_date, update_date, delete_date, school_id, user_id, title FROM news`
 				columns := []string{"id", "create_date", "update_date", "delete_date", "school_id", "user_id", "title"}
 				rows := sqlmock.NewRows(columns).AddRow(100, createDate, updateDate, nil, 1, 1, "클래스팅 새소식")
-				ts.sqlMock.ExpectQuery(query).WithArgs(1).WillReturnRows(rows)
+				ts.sqlMock.ExpectQuery(query).WillReturnRows(rows)
 			},
 			want: []domain.News{
 				{
@@ -136,7 +136,7 @@ func Test_newsRepository_ListNews(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				params: domain.ListNewsParams{
-					UserID: 1,
+					UserID: pointer.Int(1),
 					Cursor: pointer.Int(1),
 				},
 			},
@@ -144,7 +144,7 @@ func Test_newsRepository_ListNews(t *testing.T) {
 				query := `SELECT id, create_date, update_date, delete_date, school_id, user_id, title FROM news`
 				columns := []string{"id", "create_date", "update_date", "delete_date", "school_id", "user_id", "title"}
 				rows := sqlmock.NewRows(columns).AddRow(100, createDate, updateDate, nil, 1, 1, "클래스팅 새소식")
-				ts.sqlMock.ExpectQuery(query).WithArgs(1).WillReturnRows(rows)
+				ts.sqlMock.ExpectQuery(query).WillReturnRows(rows)
 			},
 			want: []domain.News{
 				{
