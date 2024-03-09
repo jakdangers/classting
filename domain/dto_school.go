@@ -4,6 +4,7 @@ import "classting/pkg/cerrors"
 
 type SchoolDTO struct {
 	ID     int    `json:"id"`
+	UserID int    `json:"userID"`
 	Name   string `json:"name"`
 	Region string `json:"region"`
 }
@@ -55,6 +56,7 @@ type ListSchoolsResponse struct {
 func SchoolDTOFrom(school School) SchoolDTO {
 	return SchoolDTO{
 		ID:     school.ID,
+		UserID: school.UserID,
 		Name:   school.Name,
 		Region: school.Region,
 	}

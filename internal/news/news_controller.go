@@ -78,7 +78,7 @@ func (n newsController) CreateNews(c *gin.Context) {
 }
 
 // ListNews
-// @Summary 학교 소식 목록 조회 [필수 구현] 권한 - 관리자
+// @Summary 학교 소식 목록 조회 [테스트 도우미] 권한 - 관리자
 // @Description 소유하고 있는 학교 소식 목록을 조회합니다. (학교 ID로 조회 가능, 커서로 페이징 가능) 10개씩 조회합니다.
 // @Description classting_admin_1은 schoolID 1, 2의 소식을 조회할 수 있습니다.
 // @Description classting_admin_2은 schoolID 3의 소식을 조회할 수 있습니다.
